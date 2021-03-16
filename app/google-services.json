@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "62766540559",
+    "project_id": "composereidofifa",
+    "storage_bucket": "composereidofifa.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:62766540559:android:cf13782eb50775d80c007a",
+        "android_client_info": {
+          "package_name": "com.example.reidofifa"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "62766540559-ts6eunlb2ej11ipjub66tqfm6624gi51.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCHiC7d-w5a3qoQ0qdnbjZTvwyQWo8NFek"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "62766540559-ts6eunlb2ej11ipjub66tqfm6624gi51.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
