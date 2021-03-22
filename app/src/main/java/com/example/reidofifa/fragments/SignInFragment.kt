@@ -36,9 +36,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SignInFragment : Fragment() {
 
-    @Inject
-    lateinit var application: BaseApplication
-
     private val viewModel: SignUpViewModel by viewModels()
 
 
@@ -121,14 +118,6 @@ class SignInFragment : Fragment() {
         }
     }
 
-
-//    fun signInSuccess(player: Player) {
-//        try {
-//
-//        } catch (e: Exception){
-//            Log.e("SSSS", "${e.message.toString()}, ${e.cause.toString()}")
-//        }
-//    }
 
     private fun signInUser(email: String, password: String) {
         val emails: String = email.trim { it <= ' ' }

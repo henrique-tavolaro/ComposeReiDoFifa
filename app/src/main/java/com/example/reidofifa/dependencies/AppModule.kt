@@ -1,11 +1,12 @@
 package com.example.reidofifa.dependencies
 
-import android.content.Context
-import com.example.reidofifa.BaseApplication
+
+import com.example.reidofifa.firebase.USERS
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -15,9 +16,19 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideApplication(
-        @ApplicationContext app: Context
-    ): BaseApplication {
-        return app as BaseApplication
-    }
+    fun provideUserDetails(): Query = FirebaseFirestore.getInstance()
+        .collection(USERS)
+//        .document(getCurrentUserID(
+//             )
+
+//    @Provides
+//    fun getCurrentUserID(): String {
+//        val currentUser = FirebaseAuth.getInstance().currentUser
+//        var currentUserID = ""
+//        if (currentUser != null) {
+//            currentUserID = currentUser.uid
+//        }
+//        return currentUserID
+//    }
+
 }

@@ -36,9 +36,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SignUpFragment : Fragment() {
 
-    @Inject
-    lateinit var application: BaseApplication
-
     private val viewModel: SignUpViewModel by viewModels()
 
 

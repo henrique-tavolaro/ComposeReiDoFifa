@@ -2,7 +2,8 @@ package com.example.reidofifa.firebase
 
 import android.util.Log
 import androidx.fragment.app.Fragment
-import com.example.reidofifa.fragments.SignInFragment
+import com.example.reidofifa.fragments.ProfileFragment
+import com.example.reidofifa.fragments.ProfileViewModel
 import com.example.reidofifa.fragments.SignUpFragment
 import com.example.reidofifa.models.Player
 import com.google.firebase.auth.FirebaseAuth
@@ -33,6 +34,21 @@ class FirestoreClass {
         return currentUserID
     }
 
+//    fun loadUserDataOnProfile(){
+//        firestore.collection(USERS)
+//            .document(getCurrentUserID())
+//            .get()
+//            .addOnSuccessListener { document ->
+//                val loggedUser = document.toObject(Player::class.java)
+//                ***
+//       }
+//            .addOnFailureListener { e ->
+//                Log.e("TAG", "Error ssssss", e)
+//
+//            }
+//    }
+
+
 //    fun loadUserData(fragment: Fragment) {
 //        firestore.collection(USERS)
 //            .document(getCurrentUserID())
@@ -47,7 +63,7 @@ class FirestoreClass {
 //                    is MainActivity -> {
 //                        activity.updateNavigationUserDetails(loggedUser!!)
 //
-//                    }
+////                    }
 //                }
 //            }
 //            .addOnFailureListener { e ->
