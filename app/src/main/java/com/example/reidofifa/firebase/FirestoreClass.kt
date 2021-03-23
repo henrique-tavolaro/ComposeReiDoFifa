@@ -34,41 +34,5 @@ class FirestoreClass {
         return currentUserID
     }
 
-//    fun loadUserDataOnProfile(){
-//        firestore.collection(USERS)
-//            .document(getCurrentUserID())
-//            .get()
-//            .addOnSuccessListener { document ->
-//                val loggedUser = document.toObject(Player::class.java)
-//                ***
-//       }
-//            .addOnFailureListener { e ->
-//                Log.e("TAG", "Error ssssss", e)
-//
-//            }
-//    }
 
-
-//    fun loadUserData(fragment: Fragment) {
-//        firestore.collection(USERS)
-//            .document(getCurrentUserID())
-//            .get()
-//            .addOnSuccessListener { document ->
-//                val loggedUser = document.toObject(Player::class.java)
-//
-//                when (fragment) {
-//                    is SignInFragment -> {
-//                        fragment.signInSuccess(loggedUser!!)
-//                    }
-//                    is MainActivity -> {
-//                        activity.updateNavigationUserDetails(loggedUser!!)
-//
-////                    }
-//                }
-//            }
-//            .addOnFailureListener { e ->
-//                Log.e("TAG", "Error signing in", e)
-//
-//            }
-//    }
 }
