@@ -9,12 +9,13 @@ import com.example.reidofifa.models.Player
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import javax.inject.Inject
 
 const val USERS = "Users"
 
-class FirestoreClass {
+class FirestoreClass(){
 
-    private val firestore = FirebaseFirestore.getInstance()
+    val firestore = FirebaseFirestore.getInstance()
 
     fun registerUser(fragment: SignUpFragment, userInfo: Player) {
         firestore.collection(USERS)
@@ -33,6 +34,5 @@ class FirestoreClass {
         }
         return currentUserID
     }
-
 
 }

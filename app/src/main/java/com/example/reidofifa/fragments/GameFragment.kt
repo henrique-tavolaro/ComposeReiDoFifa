@@ -12,10 +12,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.Button
-import androidx.compose.material.Card
-import androidx.compose.material.Divider
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,6 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.reidofifa.R
 import com.example.reidofifa.models.Game
@@ -43,15 +43,31 @@ class GameFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setContent {
                 ReiDoFifaTheme {
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        Row {
-                            Player(args.name)
-                            Column {
-                                Stats()
-                                InsertResult()
+                    val state = rememberScaffoldState()
+
+                    Scaffold(
+                        scaffoldState = state,
+                        topBar = {
+                            TopAppBar(
+                                title = { Text(text = "Matches") },
+                                navigationIcon = {
+                                    IconButton(onClick = {
+                                        findNavController().navigate(R.id.action_gameFragment_to_opponetListFragment)
+                                    }) {
+                                        Icon(Icons.Default.ArrowBack, contentDescription = null)
+                                    }
+                                }
+                            )
+                        }){
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            Row {
+                                Player(args.name)
+                                Column {
+                                    Stats()
+                                    InsertResult()
+                                }
+                                Player(args.name)
                             }
-                            Player(args.name)
-                        }
 //                        LazyColumn(modifier = Modifier.fillMaxWidth()){
 //                           items(games){ game ->
 //                                GameResults(game)
@@ -59,7 +75,9 @@ class GameFragment : Fragment() {
 //                        }
 
 
+                        }
                     }
+
                 }
             }
         }

@@ -12,36 +12,46 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.MimeTypeMap
-import android.widget.EditText
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.TextField
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
-import com.example.reidofifa.composables.DEFAULT_IMAGE
-import com.example.reidofifa.composables.LoginButton
-import com.example.reidofifa.composables.circularProgressBar
-import com.example.reidofifa.composables.loadImage
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
+import com.example.reidofifa.R
+import com.example.reidofifa.composables.*
 import com.example.reidofifa.models.Player
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.example.reidofifa.ui.theme.ReiDoFifaTheme
+import com.example.reidofifa.util.DEFAULT_IMAGE
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import kotlin.math.round
+
+const val IMAGE = "image"
+const val NAME = "name"
 
 @AndroidEntryPoint
 class ProfileFragment : Fragment() {
@@ -59,70 +69,180 @@ class ProfileFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setContent {
                 val player = viewModel.data.value
+                selectedImageUri.value = player?.image?.toUri()
                 ReiDoFifaTheme {
+                    val state = rememberScaffoldState()
 
+                    Scaffold(
+                        scaffoldState = state,
+                        topBar = {
+                            TopAppBar(
+                                title = { Text(text = "My Profile") },
+                                navigationIcon = {
+                                    IconButton(onClick = {
+                                        findNavController().navigate(R.id.action_profileFragment_to_opponetListFragment)
+                                    }) {
+                                        Icon(Icons.Default.ArrowBack, contentDescription = null)
+                                    }
+                                }
+                            )
+                        },
+                        drawerContent = {
+                            Column {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxHeight(0.32f)
+                                        .fillMaxWidth()
+                                        .background(MaterialTheme.colors.primary)
+                                ) {
+                                    if (player?.image != null) {
 
-                    Column {
-                        Card(
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .align(Alignment.CenterHorizontally)
-                                ,
-                            elevation = 8.dp,
-                            shape = RoundedCornerShape(16.dp),
+                                        player.image.let { url ->
+                                            val image =
+                                                loadImage(url = url, defaultImage = DEFAULT_IMAGE).value
+                                            image?.let { img ->
+                                                Image(
+                                                    bitmap = img.asImageBitmap(),
+                                                    modifier = Modifier
+                                                        .height(152.dp)
+                                                        .width(152.dp)
+                                                        .padding(top = 16.dp, start = 16.dp)
+                                                        .clip(CircleShape),
+                                                    contentScale = ContentScale.Crop,
+                                                    contentDescription = null
+                                                )
+                                            }
+                                        }
+                                    }
 
-                            ) {
-                            circularProgressBar(isDisplayed = viewModel.loading.value)
+                                    Text(
+                                        modifier = Modifier
+                                            .padding(start = 24.dp, top = 8.dp),
+                                        text = if(player?.name == null){
+                                            "name"
+                                        } else {
+                                            player.name
+                                        }
+                                        ,
+                                        fontSize = 20.sp,
+                                        color = MaterialTheme.colors.onPrimary
 
-                            Column(
+                                    )
+                                    Text(
+                                        modifier = Modifier
+                                            .padding(start = 24.dp, bottom = 16.dp, top = 8.dp),
+                                        text = if(player?.email == null){
+                                            "email"
+                                        } else {
+                                            player.email
+                                        },
+                                        fontSize = 16.sp,
+                                        color = MaterialTheme.colors.onPrimary
+                                    )
+
+                                }
+                                Divider(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    thickness = 1.dp,
+                                    color = Color.Black
+                                )
+                                Spacer(modifier = Modifier.padding(8.dp))
+
+                                NavOptions(
+                                    NavOption(icon = Icons.Default.Home, label = "Home"),
+                                    click = {
+                                        findNavController().navigate(R.id.action_profileFragment_to_opponetListFragment)
+                                    })
+                                NavOptions(
+
+                                    NavOption(
+                                        icon = Icons.Default.AccountBox,
+                                        label = "Profile",
+                                    ),
+                                    click = {
+
+                                    },
+                                )
+                                NavOptions(
+                                    NavOption(
+                                        icon = Icons.Default.ExitToApp,
+                                        label = "Logout"
+                                    ), click = {
+                                        FirebaseAuth.getInstance().signOut()
+                                    })
+                            }
+
+                        }
+                    ) {
+                        Column {
+                            Card(
                                 modifier = Modifier
                                     .padding(16.dp)
-                                    .fillMaxWidth()
-                            ) {
-                                val image = loadImage(
-                                    url = selectedImageUri.value,
-                                    defaultImage = DEFAULT_IMAGE
-                                ).value
-                                image?.let { img ->
-                                    Image(
-                                        bitmap = img.asImageBitmap(),
-                                        modifier = Modifier
-                                            .padding(top = 32.dp, bottom = 32.dp)
-                                            .align(Alignment.CenterHorizontally)
-                                            .width(160.dp)
-                                            .height(160.dp)
-                                            .clickable(onClick = { showImageChooser() })
-                                            .clip(CircleShape),
-                                        contentDescription = null
+                                    .align(Alignment.CenterHorizontally),
+                                elevation = 8.dp,
+                                shape = RoundedCornerShape(16.dp),
+
+                                ) {
+                                circularProgressBar(isDisplayed = viewModel.loading.value)
+
+                                Column(
+                                    modifier = Modifier
+                                        .padding(16.dp)
+                                        .fillMaxWidth()
+                                ) {
+//                                    if(player?.image != null){
+//                                    selectedImageUri.value = player.image.toUri()
+//                                }
+                                    val image = loadImageUri(
+
+                                        url = selectedImageUri.value,
+
+
+
+                                        defaultImage = DEFAULT_IMAGE
+                                    ).value
+                                    image?.let { img ->
+                                        Image(
+                                            bitmap = img.asImageBitmap(),
+                                            modifier = Modifier
+                                                .padding(top = 32.dp, bottom = 32.dp)
+                                                .align(Alignment.CenterHorizontally)
+                                                .width(160.dp)
+                                                .height(160.dp)
+                                                .clickable(onClick = { showImageChooser() })
+                                                .clip(CircleShape),
+                                            contentScale = ContentScale.Crop,
+                                            contentDescription = null
+                                        )
+                                    }
+
+                                    if (player != null) {
+                                        OutlinedTextField(
+                                            modifier = Modifier
+                                                .align(Alignment.CenterHorizontally)
+                                                .padding(bottom = 16.dp),
+                                            value = player.name,
+                                            onValueChange = { /*TODO*/ })
+                                        OutlinedTextField(
+                                            modifier = Modifier
+                                                .align(Alignment.CenterHorizontally)
+                                                .padding(16.dp),
+                                            value = player.email,
+                                            readOnly = true,
+                                            onValueChange = { /*TODO*/ })
+                                    }
+                                    LoginButton(
+                                        onButtonClick = {
+                                            uploadUserImage(player!!)
+                                            findNavController().navigate(R.id.action_profileFragment_to_opponetListFragment)
+                                        },
+                                        text = "UPDATE",
+                                        color = MaterialTheme.colors.primary
                                     )
                                 }
-
-                                if (player != null) {
-                                    OutlinedTextField(
-                                        modifier = Modifier
-                                            .align(Alignment.CenterHorizontally)
-                                            .padding(bottom = 16.dp),
-                                        value = player.name,
-                                            onValueChange = { /*TODO*/ })
-                                    OutlinedTextField(
-                                        modifier = Modifier
-                                            .align(Alignment.CenterHorizontally)
-                                            .padding(16.dp),
-                                        value = player.email,
-                                        readOnly = true,
-                                        onValueChange = { /*TODO*/ })
-                                }
-                                LoginButton(
-                                    onButtonClick = {
-                                        uploadUserImage()
-                                    },
-                                    text = "UPDATE",
-                                    color = MaterialTheme.colors.primary
-                                )
                             }
                         }
                     }
-
                 }
             }
         }
@@ -168,7 +288,22 @@ class ProfileFragment : Fragment() {
             .getExtensionFromMimeType(context?.contentResolver!!.getType(uri!!))
     }
 
-    private fun uploadUserImage() {
+
+    fun updateUserProfileData(player: Player) {
+        val userHashMap = HashMap<String, Any>()
+
+        if (profileImageURL.isNotEmpty() && profileImageURL != player.image) {
+            userHashMap[IMAGE] = profileImageURL
+        }
+
+        userHashMap[NAME] = player.name
+
+        viewModel.updateUserDetails(userHashMap)
+        Log.d("TESTE", userHashMap.toString())
+//        uploadUserImage()
+    }
+
+    fun uploadUserImage(player: Player) {
         val storageRef: StorageReference = FirebaseStorage.getInstance().reference.child(
             "USER_IMAGE" + System.currentTimeMillis() + "." + getFileExtension(selectedImageUri.value)
         )
@@ -180,7 +315,7 @@ class ProfileFragment : Fragment() {
                     Log.i("SSS2", uri.toString())
                     profileImageURL = uri.toString()
 
-//                        updateUserProfileData()
+                        updateUserProfileData(player)
                 }
             }.addOnFailureListener { e ->
                 Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
@@ -188,21 +323,6 @@ class ProfileFragment : Fragment() {
             }
         }
     }
-
-//    fun updateUserProfileData(){
-//        val userHashMap = HashMap<String, Any>()
-//
-//        if(profileImageURL.isNotEmpty() && profileImageURL != player!!.image){
-//            userHashMap["image"] = profileImageURL
-//        }
-////
-//        if(etProfileName.text.toString() != userDetails.name) {
-//            userHashMap[Constants.NAME] = etProfileName.text.toString()
-//
-//        }
-
-//        viewModel.updateUserDetails(userHashMap)
-//    }
 
 
     companion object {

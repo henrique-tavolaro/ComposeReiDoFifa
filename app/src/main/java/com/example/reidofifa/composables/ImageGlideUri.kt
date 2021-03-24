@@ -16,8 +16,8 @@ import com.example.reidofifa.R
 
 
 @Composable
-fun loadImage(
-    url: String,
+fun loadImageUri(
+    url: Uri?,
     @DrawableRes defaultImage: Int
 ): MutableState<Bitmap?> {
 

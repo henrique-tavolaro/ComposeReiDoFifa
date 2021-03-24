@@ -61,7 +61,11 @@
         android:id="@+id/profileFragment"
         android:name="com.example.reidofifa.fragments.ProfileFragment"
         android:label="fragment_profile"
-        tools:layout="@layout/fragment_profile" />
+        tools:layout="@layout/fragment_profile" >
+        <action
+            android:id="@+id/action_profileFragment_to_opponetListFragment"
+            app:destination="@id/opponetListFragment" />
+    </fragment>
     <fragment
         android:id="@+id/gameFragment"
         android:name="com.example.reidofifa.fragments.GameFragment"
@@ -76,5 +80,8 @@
         <argument
             android:name="image"
             app:argType="string" />
+        <action
+            android:id="@+id/action_gameFragment_to_opponetListFragment"
+            app:destination="@id/opponetListFragment" />
     </fragment>
 </navigation>

@@ -19,7 +19,6 @@ class ProfileViewModel @Inject constructor(
 
     val data: MutableState<Player?> = mutableStateOf(null)
 
-
     init {
         getUser()
     }
@@ -29,15 +28,18 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             val loggedUser = repository.getPlayerFromFirestore().data
             loggedUser!!.addOnSuccessListener { document ->
-               val logged = document.toObject(Player::class.java)
+                val logged = document.toObject(Player::class.java)
                 data.value = logged!!
                 loading.value = false
             }
         }
     }
 
-//    fun updateUserDetails(userHashMap: HashMap<String, Any>) {
-//        repository.updateUserDetails(userHashMap)
-//    }
+    fun updateUserDetails(userHashMap: HashMap<String, Any>) {
+        viewModelScope.launch {
+            repository.updateUserProfile(userHashMap)
+
+        }
+    }
 
 }

@@ -14,7 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 class OpponentListViewModel @Inject constructor(
     private val repository: PlayersRepository
-): ViewModel(){
+) : ViewModel() {
 
     var loading = mutableStateOf(false)
     val data: MutableState<DataOrException<List<Player>, Exception>> = mutableStateOf(
@@ -24,8 +24,11 @@ class OpponentListViewModel @Inject constructor(
         )
     )
 
+    val player: MutableState<Player?> = mutableStateOf(null)
+
     init {
         getOpponents()
+        loadUserDetails()
     }
 
     private fun getOpponents() {
@@ -33,6 +36,16 @@ class OpponentListViewModel @Inject constructor(
             loading.value = true
             data.value = repository.getAllPlayers()
             loading.value = false
+        }
+    }
+
+    private fun loadUserDetails() {
+        viewModelScope.launch {
+            val loggedUser = repository.getPlayerFromFirestore().data
+            loggedUser!!.addOnSuccessListener { document ->
+                val logged = document.toObject(Player::class.java)
+                player.value = logged!!
+            }
         }
     }
 }
