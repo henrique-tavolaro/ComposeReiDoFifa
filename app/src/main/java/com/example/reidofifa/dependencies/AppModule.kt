@@ -3,12 +3,15 @@ package com.example.reidofifa.dependencies
 
 import android.util.Log
 import com.example.reidofifa.firebase.USERS
+import com.example.reidofifa.util.GAMES
+import com.example.reidofifa.util.PLAYERS
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -38,12 +41,16 @@ object AppModule {
             .collection(USERS)
             .whereNotEqualTo("id", getCurrentUserID())
 
-//    @Provides
-//    fun provideUpdateUserProfileData(userHashMap: HashMap<String, Any>) =
-//        FirebaseFirestore.getInstance()
-//            .collection(USERS)
-//            .document(getCurrentUserID())
-//
+
+
+//        user1: String, user2: String
+    @Provides
+    @Named("queryGame")
+    fun provideGetAllGames(): Query =
+        FirebaseFirestore.getInstance()
+                .collection(GAMES)
+//                .whereIn(PLAYERS, listOf(user1 + "_" + user2, user2 + "_" + user1))
+
 
 }
 

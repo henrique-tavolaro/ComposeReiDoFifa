@@ -1,50 +1,94 @@
 package com.example.reidofifa.fragments
 
-import android.media.Image
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.ContentView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.reidofifa.R
+import com.example.reidofifa.composables.loadImage
 import com.example.reidofifa.models.Game
 import com.example.reidofifa.ui.theme.ReiDoFifaTheme
+import com.example.reidofifa.util.*
 import dagger.hilt.android.AndroidEntryPoint
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 @AndroidEntryPoint
 class GameFragment : Fragment() {
 
+    private val viewModel: GamesViewModel by viewModels()
     val args: GameFragmentArgs by navArgs()
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         return ComposeView(requireContext()).apply {
             setContent {
+                val player = viewModel.player.value
                 ReiDoFifaTheme {
-                    val state = rememberScaffoldState()
 
+
+                    val resultP1 = viewModel.resultP1.value
+                    val resultP2 = viewModel.resultP2.value
+
+                    val state = rememberScaffoldState()
+                    var win = 0
+                    var draw = 0
+                    var lost = 0
+                    var games = listOf<Game>()
+                    if (player != null) {
+
+                        viewModel.getAllGames(player.id, args.id)
+                        games = viewModel.data.value.data!!
+                        Log.d("TESTE", games.toString())
+                        for (game in games) {
+                            if (game.resultP1.toInt() == game.resultP2.toInt()) {
+                                draw++
+                            }
+                            if ((game.player1Id == player.id && game.resultP1.toInt() > game.resultP2.toInt() ||
+                                        game.player2Id == player.id && game.resultP2.toInt() > game.resultP1.toInt()
+                                        )
+                            ) {
+                                win++
+                            }
+                            if ((game.player1Id == player.id && game.resultP1.toInt() < game.resultP2.toInt() ||
+                                        game.player2Id == player.id && game.resultP2.toInt() < game.resultP1.toInt()
+                                        )
+                            ){
+                                lost++
+                            }
+                        }
+                    }
+//                    val game = viewModel.provideGetAllGames(player!!.id, args.id)
                     Scaffold(
                         scaffoldState = state,
                         topBar = {
@@ -58,21 +102,56 @@ class GameFragment : Fragment() {
                                     }
                                 }
                             )
-                        }){
+                        }) {
                         Column(modifier = Modifier.fillMaxWidth()) {
                             Row {
-                                Player(args.name)
-                                Column {
-                                    Stats()
-                                    InsertResult()
+                                if (player != null) {
+                                    Player(
+                                        name = player.name,
+                                        url = player.image
+                                    )
                                 }
-                                Player(args.name)
+
+
+                                Column {
+                                    val sdf = SimpleDateFormat("dd.MM.yyyy")
+                                    val currDate: String = sdf.format(Date())
+                                    Stats(win, draw, lost)
+                                    if (player != null) {
+                                        val game = hashMapOf(
+                                            ID to "",
+                                            PLAYER1ID to player!!.id,
+                                            PLAYER2ID to args.id,
+                                            RESULT1 to resultP1,
+                                            RESULT2 to resultP2,
+                                            DATE to currDate,
+                                            PLAYERS to player.id + "_" + args.id
+                                        )
+                                        InsertResult(
+                                            resultP1 = resultP1,
+                                            onResultP1Changed = viewModel::onResultP1Changed,
+                                            resultP2 = resultP2,
+                                            onResultP2Changed = viewModel::onResultP2Changed,
+                                            onClick = {
+                                                viewModel.registerGame(game)
+                                                viewModel.getAllGames(player.id, args.id)
+                                            }
+                                        )
+                                    }
+                                }
+                                if (player != null) {
+                                    Player(
+                                        name = args.name,
+                                        url = args.image
+                                    )
+                                }
                             }
-//                        LazyColumn(modifier = Modifier.fillMaxWidth()){
-//                           items(games){ game ->
-//                                GameResults(game)
-//                           }
-//                        }
+                            LazyColumn(modifier = Modifier.fillMaxWidth()) {
+
+                                items(games!!) { game ->
+                                    GameResults(game)
+                                }
+                            }
 
 
                         }
@@ -89,7 +168,7 @@ class GameFragment : Fragment() {
 @Composable
 fun Player(
     name: String,
-//    image: String
+    url: String
 ) {
     Card(
         modifier = Modifier.padding(8.dp),
@@ -103,23 +182,34 @@ fun Player(
                     .padding(8.dp)
                     .align(Alignment.CenterHorizontally)
             )
-            Image(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .width(106.dp)
-                    .height(106.dp),
-                painter = painterResource(
-                    id = R.drawable.ic_user_place_holder
-                ),
-                contentDescription = null
-            )
 
+
+            val image =
+                loadImage(url = url, defaultImage = DEFAULT_IMAGE).value
+            image?.let { img ->
+                Image(
+                    bitmap = img.asImageBitmap(),
+                    modifier = Modifier
+                        .height(106.dp)
+                        .width(106.dp)
+                        .padding(8.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop,
+                    contentDescription = null
+                )
+            }
         }
+
     }
 }
 
+
 @Composable
-fun Stats() {
+fun Stats(
+    win: Int,
+    draw: Int,
+    lost: Int
+) {
     Card(
         modifier = Modifier
             .padding(8.dp)
@@ -170,25 +260,31 @@ fun Stats() {
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 Text(
-                    text = "--",
+                    text = win.toString(),
                     fontSize = 13.sp
                 )
                 Text(
-                    text = "--",
+                    text = draw.toString(),
                     fontSize = 13.sp
                 )
                 Text(
-                    text = "--",
+                    text = lost.toString(),
                     fontSize = 13.sp
                 )
             }
-            InsertResult()
+
         }
     }
 }
 
 @Composable
-fun InsertResult() {
+fun InsertResult(
+    resultP1: String,
+    onResultP1Changed: (String) -> Unit,
+    resultP2: String,
+    onResultP2Changed: (String) -> Unit,
+    onClick: () -> Unit
+) {
     Column(
         modifier = Modifier
             .width(100.dp)
@@ -204,8 +300,13 @@ fun InsertResult() {
         ) {
             BasicTextField(
                 modifier = Modifier.width(8.dp),
-                value = "0",
-                onValueChange = { /*TODO*/ },
+                value = resultP1,
+                onValueChange = onResultP1Changed,
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number
+                )
+                // TODO arrumar o input do usuário.
             )
             Text(
                 text = "X",
@@ -213,12 +314,17 @@ fun InsertResult() {
             )
             BasicTextField(
                 modifier = Modifier.width(8.dp),
-                value = "0",
-                onValueChange = { /*TODO*/ },
+                value = resultP2,
+                onValueChange = onResultP2Changed,
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number
+                )
+                // TODO arrumar o input do usuário.
             )
         }
         Button(
-            onClick = { /*TODO*/ },
+            onClick = onClick,
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .width(100.dp)
@@ -232,6 +338,9 @@ fun InsertResult() {
     }
 }
 
+val game = Game("id", "1", "2", "3", "4", "12.12.2012", "1_2")
+
+
 @Composable
 fun GameResults(game: Game) {
     Row(
@@ -242,12 +351,17 @@ fun GameResults(game: Game) {
     ) {
         Text(
             modifier = Modifier.padding(8.dp),
-            text = "12.12.2112",
+            text = game.date,
         )
-        Text(
-            modifier = Modifier.padding(8.dp),
-            text = "0 x 0"
-        )
+        Row(modifier = Modifier.padding(8.dp)) {
+            Text(text = game.resultP1)
+            Text(
+                modifier = Modifier.padding(horizontal = 4.dp),
+                text = "x"
+            )
+            Text(text = game.resultP2)
+        }
+
     }
 }
 
@@ -271,20 +385,18 @@ fun GameResults(game: Game) {
 //    }
 //}
 
-@Preview
-@Composable
-fun PreviewResult(){
-    InsertResult()
-}
+//@Preview
+//@Composable
+//fun PreviewResult(){
+//    InsertResult()
+//}
 
 
-
-@Preview
-@Composable
-fun PreviewStats(){
-    Stats()
-}
-
+//@Preview
+//@Composable
+//fun PreviewStats(){
+//    Stats()
+//}
 
 
 //        @Preview
