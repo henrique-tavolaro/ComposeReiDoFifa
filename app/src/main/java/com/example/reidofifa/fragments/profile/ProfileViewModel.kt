@@ -1,51 +1,47 @@
-package com.example.reidofifa.fragments
+package com.example.reidofifa.fragments.profile
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.reidofifa.dependencies.PlayersRepository
-import com.example.reidofifa.models.DataOrException
 import com.example.reidofifa.models.Player
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class OpponentListViewModel @Inject constructor(
+class ProfileViewModel @Inject constructor(
     private val repository: PlayersRepository
 ) : ViewModel() {
 
     var loading = mutableStateOf(false)
-    val data: MutableState<DataOrException<List<Player>, Exception>> = mutableStateOf(
-        DataOrException(
-            listOf(),
-            Exception("")
-        )
-    )
 
-    val player: MutableState<Player?> = mutableStateOf(null)
+    val data: MutableState<Player?> = mutableStateOf(null)
 
     init {
-        getOpponents()
-        loadUserDetails()
+        getUser()
     }
 
-    private fun getOpponents() {
-        viewModelScope.launch {
-            loading.value = true
-            data.value = repository.getAllPlayers()
-            loading.value = false
-        }
-    }
-
-    private fun loadUserDetails() {
+    private fun getUser() {
+        loading.value = true
         viewModelScope.launch {
             val loggedUser = repository.getPlayerFromFirestore().data
             loggedUser!!.addOnSuccessListener { document ->
                 val logged = document.toObject(Player::class.java)
-                player.value = logged!!
+                data.value = logged!!
+                loading.value = false
             }
         }
     }
+
+    fun updateUserDetails(userHashMap: HashMap<String, Any>) {
+        viewModelScope.launch {
+            repository.updateUserProfile(userHashMap)
+
+        }
+    }
+
+
+
 }

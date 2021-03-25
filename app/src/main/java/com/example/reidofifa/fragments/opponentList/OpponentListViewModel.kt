@@ -1,4 +1,4 @@
-package com.example.reidofifa.fragments
+package com.example.reidofifa.fragments.opponentList
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -13,42 +13,45 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class GamesViewModel @Inject constructor(
+class OpponentListViewModel @Inject constructor(
     private val repository: PlayersRepository
-): ViewModel() {
+) : ViewModel() {
 
-    val player: MutableState<Player?> = mutableStateOf(null)
-    val resultP1 = mutableStateOf("0")
-    val resultP2 = mutableStateOf("0")
-    val data: MutableState<DataOrException<List<Game>, Exception>> = mutableStateOf(
+    var loading = mutableStateOf(false)
+    val data: MutableState<DataOrException<List<Player>, Exception>> = mutableStateOf(
+        DataOrException(
+            listOf(),
+            Exception("")
+        )
+    )
+    val dataGames: MutableState<DataOrException<List<Game>, Exception>> = mutableStateOf(
         DataOrException(
             listOf(),
             Exception("")
         )
     )
 
-    init{
+    val player: MutableState<Player?> = mutableStateOf(null)
+
+    init {
+        getOpponents()
         loadUserDetails()
+        getAllGames()
     }
 
-    fun getAllGames(
-        user1: String, user2: String
-    ) {
+    private fun getAllGames(){
         viewModelScope.launch {
-            data.value = repository.getAllGames(
-                user1, user2
-            )
+            dataGames.value = repository.getAllGames()
         }
     }
 
-    fun onResultP1Changed(result: String) {
-        this.resultP1.value = result
+    private fun getOpponents() {
+        viewModelScope.launch {
+            loading.value = true
+            data.value = repository.getAllPlayers()
+            loading.value = false
+        }
     }
-
-    fun onResultP2Changed(result: String) {
-        this.resultP2.value = result
-    }
-
 
     private fun loadUserDetails() {
         viewModelScope.launch {
@@ -59,12 +62,4 @@ class GamesViewModel @Inject constructor(
             }
         }
     }
-
-    fun registerGame(gameHashMap: HashMap<String, String>){
-        viewModelScope.launch {
-            repository.registerGame(gameHashMap)
-        }
-    }
-
-
 }

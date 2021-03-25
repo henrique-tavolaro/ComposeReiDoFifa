@@ -35,7 +35,7 @@
     </fragment>
     <fragment
         android:id="@+id/opponetListFragment"
-        android:name="com.example.reidofifa.fragments.OpponetListFragment"
+        android:name="com.example.reidofifa.fragments.opponentList.OpponetListFragment"
         android:label="fragment_opponet_list"
         tools:layout="@layout/fragment_opponet_list" >
         <action
@@ -59,7 +59,7 @@
     </fragment>
     <fragment
         android:id="@+id/profileFragment"
-        android:name="com.example.reidofifa.fragments.ProfileFragment"
+        android:name="com.example.reidofifa.fragments.profile.ProfileFragment"
         android:label="fragment_profile"
         tools:layout="@layout/fragment_profile" >
         <action
@@ -68,7 +68,7 @@
     </fragment>
     <fragment
         android:id="@+id/gameFragment"
-        android:name="com.example.reidofifa.fragments.GameFragment"
+        android:name="com.example.reidofifa.fragments.gamefragment.GameFragment"
         android:label="fragment_game"
         tools:layout="@layout/fragment_game" >
         <argument

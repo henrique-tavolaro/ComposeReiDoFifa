@@ -1,15 +1,10 @@
 package com.example.reidofifa.dependencies
 
 
-import android.util.Log
 import com.example.reidofifa.firebase.Firestore
-import com.example.reidofifa.firebase.FirestoreClass
-import com.example.reidofifa.firebase.USERS
-import com.example.reidofifa.fragments.ProfileFragment
 import com.example.reidofifa.models.DataOrException
 import com.example.reidofifa.models.Game
 import com.example.reidofifa.models.Player
-import com.example.reidofifa.util.GAMES
 import com.example.reidofifa.util.PLAYERS
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentReference
@@ -39,7 +34,22 @@ class PlayersRepository @Inject constructor(
         return dataOrException
     }
 
-    suspend fun getAllGames(
+    suspend fun getAllGames(): DataOrException<List<Game>, Exception> {
+        val dataOrException = DataOrException<List<Game>, Exception>()
+        try {
+
+            dataOrException.data =
+                queryGame.get()
+                    .await().map { document ->
+                    document.toObject(Game::class.java)
+                }
+        } catch (e: FirebaseFirestoreException) {
+            dataOrException.e = e
+        }
+        return dataOrException
+    }
+
+    suspend fun getGamesWithOpponent(
         user1: String, user2: String
     ): DataOrException<List<Game>, Exception> {
         val dataOrException = DataOrException<List<Game>, Exception>()

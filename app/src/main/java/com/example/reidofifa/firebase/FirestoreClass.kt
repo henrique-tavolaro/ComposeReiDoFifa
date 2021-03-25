@@ -1,15 +1,10 @@
 package com.example.reidofifa.firebase
 
-import android.util.Log
-import androidx.fragment.app.Fragment
-import com.example.reidofifa.fragments.ProfileFragment
-import com.example.reidofifa.fragments.ProfileViewModel
 import com.example.reidofifa.fragments.SignUpFragment
 import com.example.reidofifa.models.Player
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
-import javax.inject.Inject
 
 const val USERS = "Users"
 

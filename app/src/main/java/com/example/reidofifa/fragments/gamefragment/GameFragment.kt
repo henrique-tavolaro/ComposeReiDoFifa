@@ -1,4 +1,4 @@
-package com.example.reidofifa.fragments
+package com.example.reidofifa.fragments.gamefragment
 
 import android.os.Bundle
 import android.util.Log
@@ -24,7 +24,6 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.viewModels

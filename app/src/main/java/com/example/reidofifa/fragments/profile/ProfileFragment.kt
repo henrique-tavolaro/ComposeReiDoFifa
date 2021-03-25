@@ -1,4 +1,4 @@
-package com.example.reidofifa.fragments
+package com.example.reidofifa.fragments.profile
 
 import android.app.Activity
 import android.content.Intent
@@ -23,7 +23,6 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,13 +30,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
 import com.example.reidofifa.R
 import com.example.reidofifa.composables.*
 import com.example.reidofifa.models.Player
@@ -47,8 +44,6 @@ import com.example.reidofifa.ui.theme.ReiDoFifaTheme
 import com.example.reidofifa.util.DEFAULT_IMAGE
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
-import kotlin.math.round
 
 const val IMAGE = "image"
 const val NAME = "name"
@@ -190,9 +185,6 @@ class ProfileFragment : Fragment() {
                                         .padding(16.dp)
                                         .fillMaxWidth()
                                 ) {
-//                                    if(player?.image != null){
-//                                    selectedImageUri.value = player.image.toUri()
-//                                }
                                     val image = loadImageUri(
 
                                         url = selectedImageUri.value,
