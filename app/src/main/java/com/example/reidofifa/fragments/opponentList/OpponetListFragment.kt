@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -33,6 +34,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.example.reidofifa.composables.NavOption
 import com.example.reidofifa.composables.Opponent
 import com.example.reidofifa.composables.loadImage
+import com.example.reidofifa.ui.theme.PrimaryColor
+import com.example.reidofifa.ui.theme.PrimaryLightColor
 import com.example.reidofifa.util.DEFAULT_IMAGE
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -57,7 +60,7 @@ class OpponetListFragment : Fragment() {
 
                     val state = rememberScaffoldState()
                     val coroutineScope = rememberCoroutineScope()
-                    Log.d("ZI", player.toString())
+
                     Scaffold(
                         scaffoldState = state,
                         topBar = {
@@ -80,7 +83,12 @@ class OpponetListFragment : Fragment() {
                                     modifier = Modifier
                                         .fillMaxHeight(0.32f)
                                         .fillMaxWidth()
-                                        .background(MaterialTheme.colors.primary)
+                                            .background(brush = Brush.horizontalGradient(
+                                            colors = listOf(
+                                                PrimaryLightColor,
+                                                PrimaryColor
+                                            )
+                                        ))
                                 ) {
                                     if (player?.image != null) {
 
@@ -139,21 +147,26 @@ class OpponetListFragment : Fragment() {
 
                                 NavOptions(
                                     NavOption(icon = Icons.Default.Home, label = "Home"),
-                                    click = {})
+                                    click = {},
+                                    background = Color.LightGray.copy(alpha = 0.4f)
+                                )
                                 NavOptions(
                                     NavOption(
                                         icon = Icons.Default.AccountBox,
                                         label = "Profile"
                                     ), click = {
                                         findNavController().navigate(R.id.action_opponetListFragment_to_profileFragment)
-                                    })
+                                    },
+                                    background = Color.White)
                                 NavOptions(
                                     NavOption(
                                         icon = Icons.Default.ExitToApp,
                                         label = "Logout"
                                     ), click = {
                                         FirebaseAuth.getInstance().signOut()
-                                    })
+                                        findNavController().navigate(R.id.action_opponetListFragment_to_loginFragment)
+                                    }, background = Color.White)
+
                             }
                         }
 
@@ -171,7 +184,6 @@ class OpponetListFragment : Fragment() {
                                     if(game.players == (player!!.id + "_" + oppon.id) ||
                                         game.players == (oppon.id + "_" + player.id)){
                                         count++
-                                        Log.d("TESTE3", game.players)
                                     }
                                 }
                                 Opponent(

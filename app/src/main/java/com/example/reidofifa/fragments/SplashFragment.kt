@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.Px
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -16,8 +17,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.fragment.findNavController
 import com.example.reidofifa.R
@@ -48,18 +55,20 @@ class SplashFragment : Fragment() {
                                 .align(Alignment.CenterHorizontally)
                         ) {
                             Image(
-                                painter = painterResource(id = R.drawable.splash),
+                                painter = painterResource(id = R.drawable.fifa_splash),
                                 contentDescription = null,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .fillMaxHeight()
+                                    .fillMaxHeight(),
+                                contentScale = ContentScale.FillHeight
                             )
                             Text(
-
                                 text = "Rei Do Fifa",
-                            fontSize = 32.sp,
+                                fontSize = 72.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.align(Alignment.Center),
+                                color = Color.White
                             )
-                            //TODO splash screen
 
                         }
                     }
@@ -79,7 +88,7 @@ class SplashFragment : Fragment() {
             } else {
                 findNavController().navigate(R.id.action_splashFragment_to_loginFragment)
             }
-        }, 200)
+        }, 3000)
 
 
     }

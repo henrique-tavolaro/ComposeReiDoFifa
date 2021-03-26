@@ -13,13 +13,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -60,9 +62,9 @@ class SignInFragment : Fragment() {
                         Text(
                             text = "Enter e-mail and password to login",
                             modifier = Modifier
-                                .padding(top = 32.dp, start = 16.dp, end = 16.dp)
-                                .align(Alignment.CenterHorizontally),
-                            style = MaterialTheme.typography.h5
+                                .padding(top = 32.dp, start = 16.dp, end = 16.dp),
+                            style = MaterialTheme.typography.h5,
+                            textAlign = TextAlign.Center
                         )
                         Card(
                             modifier = Modifier
@@ -72,7 +74,7 @@ class SignInFragment : Fragment() {
                         ) {
                             Column {
 
-                                TextField(
+                                OutlinedTextField(
                                     modifier = Modifier
                                         .padding(top = 32.dp, start = 16.dp, end = 16.dp)
                                         .fillMaxWidth()
@@ -84,24 +86,31 @@ class SignInFragment : Fragment() {
                                     label = {
                                         Text(text = "E-mail")
                                     },
-                                    textStyle = MaterialTheme.typography.h5
+                                    textStyle = MaterialTheme.typography.h5,
+                                    keyboardOptions = KeyboardOptions(
+                                        imeAction = ImeAction.Next
+                                    )
+
                                 )
-                                TextField(
+                                OutlinedTextField(
+                                    modifier = Modifier
+                                        .padding(16.dp)
+                                        .fillMaxWidth()
+                                        .background(Color.White),
                                     value = password,
                                     onValueChange = { newValue ->
                                         viewModel.onPasswordChange(newValue)
                                     },
-                                    modifier = Modifier
-                                        .padding(16.dp)
-                                        .fillMaxWidth()
-                                        .background(MaterialTheme.colors.background),
 
                                     label = {
                                         Text(text = "Password")
                                     },
-                                    textStyle = MaterialTheme.typography.h5
+                                    textStyle = MaterialTheme.typography.h5,
+                                    keyboardOptions = KeyboardOptions(
+                                        imeAction = ImeAction.Done
+                                    ),
+                                    visualTransformation = PasswordVisualTransformation()
                                 )
-
                                 LoginButton(
                                     onButtonClick = {
                                         signInUser(email, password)
@@ -127,11 +136,9 @@ class SignInFragment : Fragment() {
             FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-//                        FirestoreClass().loadUserData(this)
                         findNavController().navigate(R.id.action_signInFragment_to_opponetListFragment)
-//                    } else {
-//                        TODO Toast não está funcionando
-//                        Toast.makeText(this, "failed", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(context, "failed", Toast.LENGTH_SHORT).show()
                     }
                 }
         }
@@ -141,13 +148,11 @@ class SignInFragment : Fragment() {
         when {
 
             TextUtils.isEmpty(email) -> {
-//                Toast.makeText(this, "Please insert E-mail", Toast.LENGTH_SHORT).show()
-//                TODO arrumar Toast
+                Toast.makeText(context, "Please insert E-mail", Toast.LENGTH_SHORT).show()
                 return false
             }
             TextUtils.isEmpty(password) -> {
-//                Toast.makeText(this, "Please insert Password", Toast.LENGTH_SHORT).show()
-//                TODO arrumar Toast
+                Toast.makeText(context, "Please insert Password", Toast.LENGTH_SHORT).show()
                 return false
             }
             else -> return true

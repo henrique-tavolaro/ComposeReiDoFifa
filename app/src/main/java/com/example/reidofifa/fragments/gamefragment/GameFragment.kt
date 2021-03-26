@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,7 +24,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.viewModels
@@ -82,7 +85,7 @@ class GameFragment : Fragment() {
                             if ((game.player1Id == player.id && game.resultP1.toInt() < game.resultP2.toInt() ||
                                         game.player2Id == player.id && game.resultP2.toInt() < game.resultP1.toInt()
                                         )
-                            ){
+                            ) {
                                 lost++
                             }
                         }
@@ -103,48 +106,84 @@ class GameFragment : Fragment() {
                             )
                         }) {
                         Column(modifier = Modifier.fillMaxWidth()) {
+
                             Row {
-                                if (player != null) {
-                                    Player(
-                                        name = player.name,
-                                        url = player.image
-                                    )
-                                }
-
-
-                                Column {
-                                    val sdf = SimpleDateFormat("dd.MM.yyyy")
-                                    val currDate: String = sdf.format(Date())
-                                    Stats(win, draw, lost)
+                                Row(modifier = Modifier.weight(1f)) {
                                     if (player != null) {
-                                        val game = hashMapOf(
-                                            ID to "",
-                                            PLAYER1ID to player!!.id,
-                                            PLAYER2ID to args.id,
-                                            RESULT1 to resultP1,
-                                            RESULT2 to resultP2,
-                                            DATE to currDate,
-                                            PLAYERS to player.id + "_" + args.id
-                                        )
-                                        InsertResult(
-                                            resultP1 = resultP1,
-                                            onResultP1Changed = viewModel::onResultP1Changed,
-                                            resultP2 = resultP2,
-                                            onResultP2Changed = viewModel::onResultP2Changed,
-                                            onClick = {
-                                                viewModel.registerGame(game)
-                                                viewModel.getAllGames(player.id, args.id)
-                                            }
+                                        Player(
+                                            name = player.name,
+                                            url = player.image
                                         )
                                     }
                                 }
+                                Row(modifier = Modifier.weight(0.7f)) {
+                                    Column {
+                                        Text(
+                                            text = "Vs.",
+                                            modifier = Modifier
+                                                .padding(bottom = 16.dp, top = 24.dp)
+                                                .align(Alignment.CenterHorizontally),
+                                            fontSize = 20.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                        Stats(win, draw, lost)
+                                    }
+
+                                }
+
+                                Row(modifier = Modifier.weight(1f)) {
+                                    if (player != null) {
+                                        Player(
+                                            name = args.name,
+                                            url = args.image
+                                        )
+                                    }
+                                }
+
+                            }
+
+                            Row {
+                                val sdf = SimpleDateFormat("dd.MM.yyyy")
+                                val currDate: String = sdf.format(Date())
+
                                 if (player != null) {
-                                    Player(
-                                        name = args.name,
-                                        url = args.image
+                                    val game = hashMapOf(
+                                        ID to "",
+                                        PLAYER1ID to player!!.id,
+                                        PLAYER2ID to args.id,
+                                        RESULT1 to resultP1,
+                                        RESULT2 to resultP2,
+                                        DATE to currDate,
+                                        PLAYERS to player.id + "_" + args.id
+                                    )
+
+                                    InsertResult(
+                                        resultP1 = resultP1,
+                                        onResultP1Changed = viewModel::onResultP1Changed,
+                                        resultP2 = resultP2,
+                                        onResultP2Changed = viewModel::onResultP2Changed,
+                                        onClick = {
+                                            if (resultP1 == "" || resultP2 == "") {
+                                                Toast.makeText(
+                                                    context,
+                                                    "Insert result",
+                                                    Toast.LENGTH_LONG
+                                                ).show()
+                                            } else {
+                                                viewModel.registerGame(game)
+                                                viewModel.getAllGames(player.id, args.id)
+
+                                            }
+                                        }
                                     )
                                 }
+
                             }
+                            Divider(
+                                modifier = Modifier
+                                    .padding(8.dp),
+                                thickness = 1.dp
+                            )
                             LazyColumn(modifier = Modifier.fillMaxWidth()) {
 
                                 items(games!!) { game ->
@@ -160,9 +199,8 @@ class GameFragment : Fragment() {
             }
         }
     }
-
-
 }
+
 
 @Composable
 fun Player(
@@ -170,16 +208,20 @@ fun Player(
     url: String
 ) {
     Card(
-        modifier = Modifier.padding(8.dp),
-        elevation = 8.dp
-    ) {
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth(),
+        elevation = 8.dp,
+
+        ) {
         Column(modifier = Modifier.padding(8.dp)) {
             Text(
                 text = name,
                 fontSize = 18.sp,
                 modifier = Modifier
                     .padding(8.dp)
-                    .align(Alignment.CenterHorizontally)
+                    .align(Alignment.CenterHorizontally),
+                softWrap = false
             )
 
 
@@ -192,7 +234,8 @@ fun Player(
                         .height(106.dp)
                         .width(106.dp)
                         .padding(8.dp)
-                        .clip(CircleShape),
+                        .clip(CircleShape)
+                        .align(Alignment.CenterHorizontally),
                     contentScale = ContentScale.Crop,
                     contentDescription = null
                 )
@@ -286,8 +329,13 @@ fun InsertResult(
 ) {
     Column(
         modifier = Modifier
-            .width(100.dp)
+            .fillMaxWidth()
     ) {
+        Text(
+            text = "Insert Game Result",
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
 
         Row(
             modifier = Modifier
@@ -297,22 +345,24 @@ fun InsertResult(
             horizontalArrangement = Arrangement.SpaceEvenly
 
         ) {
-            BasicTextField(
-                modifier = Modifier.width(8.dp),
+            OutlinedTextField(
+                modifier = Modifier.width(56.dp),
                 value = resultP1,
                 onValueChange = onResultP1Changed,
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number
-                )
+                ),
+
                 // TODO arrumar o input do usuário.
             )
             Text(
                 text = "X",
-                fontSize = 14.sp
+                fontSize = 18.sp,
+                modifier = Modifier.padding(top = 24.dp)
             )
-            BasicTextField(
-                modifier = Modifier.width(8.dp),
+            OutlinedTextField(
+                modifier = Modifier.width(56.dp),
                 value = resultP2,
                 onValueChange = onResultP2Changed,
                 singleLine = true,
@@ -326,18 +376,18 @@ fun InsertResult(
             onClick = onClick,
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
-                .width(100.dp)
+                .width(250.dp)
         ) {
             Text(
                 text = "SAVE GAME",
                 modifier = Modifier.fillMaxWidth(),
-                fontSize = 10.sp
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
             )
         }
     }
 }
-
-val game = Game("id", "1", "2", "3", "4", "12.12.2012", "1_2")
 
 
 @Composable
@@ -360,47 +410,6 @@ fun GameResults(game: Game) {
             )
             Text(text = game.resultP2)
         }
-
     }
 }
-
-//@Preview
-//@Composable
-//fun PreviewGameResult() {
-//    Column {
-//        Row {
-//            Player()
-//            Stats()
-//
-//            Player()
-//        }
-//                        LazyColumn(modifier = Modifier.fillMaxWidth()){
-//                           items(games){ game ->
-//                                GameResults(game)
-//                           }
-//                        }
-
-//
-//    }
-//}
-
-//@Preview
-//@Composable
-//fun PreviewResult(){
-//    InsertResult()
-//}
-
-
-//@Preview
-//@Composable
-//fun PreviewStats(){
-//    Stats()
-//}
-
-
-//        @Preview
-//@Composable
-//fun PreviewPlayer(){
-//    Player()
-//}
 

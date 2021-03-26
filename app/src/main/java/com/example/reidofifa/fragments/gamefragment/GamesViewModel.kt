@@ -18,8 +18,8 @@ class GamesViewModel @Inject constructor(
 ): ViewModel() {
 
     val player: MutableState<Player?> = mutableStateOf(null)
-    val resultP1 = mutableStateOf("0")
-    val resultP2 = mutableStateOf("0")
+    val resultP1 = mutableStateOf("")
+    val resultP2 = mutableStateOf("")
     val data: MutableState<DataOrException<List<Game>, Exception>> = mutableStateOf(
         DataOrException(
             listOf(),
@@ -27,7 +27,7 @@ class GamesViewModel @Inject constructor(
         )
     )
 
-    init{
+    init {
         loadUserDetails()
     }
 
@@ -42,11 +42,16 @@ class GamesViewModel @Inject constructor(
     }
 
     fun onResultP1Changed(result: String) {
-        this.resultP1.value = result
+
+        if (result.length <= 2) {
+            this.resultP1.value = result.filter { it.isDigit() }
+        }
     }
 
     fun onResultP2Changed(result: String) {
-        this.resultP2.value = result
+        if (result.length <= 2) {
+            this.resultP2.value = result.filter { it.isDigit() }
+        }
     }
 
 
@@ -60,11 +65,11 @@ class GamesViewModel @Inject constructor(
         }
     }
 
-    fun registerGame(gameHashMap: HashMap<String, String>){
+    fun registerGame(gameHashMap: HashMap<String, String>) {
         viewModelScope.launch {
             repository.registerGame(gameHashMap)
         }
     }
-
-
 }
+
+

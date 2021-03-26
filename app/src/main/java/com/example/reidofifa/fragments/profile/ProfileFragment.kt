@@ -23,6 +23,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,6 +45,7 @@ import com.example.reidofifa.ui.theme.ReiDoFifaTheme
 import com.example.reidofifa.util.DEFAULT_IMAGE
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 const val IMAGE = "image"
 const val NAME = "name"
@@ -66,7 +68,10 @@ class ProfileFragment : Fragment() {
                 val player = viewModel.data.value
                 selectedImageUri.value = player?.image?.toUri()
                 ReiDoFifaTheme {
+
+
                     val state = rememberScaffoldState()
+                    val coroutineScope = rememberCoroutineScope()
 
                     Scaffold(
                         scaffoldState = state,
@@ -75,9 +80,11 @@ class ProfileFragment : Fragment() {
                                 title = { Text(text = "My Profile") },
                                 navigationIcon = {
                                     IconButton(onClick = {
-                                        findNavController().navigate(R.id.action_profileFragment_to_opponetListFragment)
+                                        coroutineScope.launch {
+                                            state.drawerState.open()
+                                        }
                                     }) {
-                                        Icon(Icons.Default.ArrowBack, contentDescription = null)
+                                        Icon(Icons.Default.Menu, contentDescription = null)
                                     }
                                 }
                             )
@@ -147,7 +154,9 @@ class ProfileFragment : Fragment() {
                                     NavOption(icon = Icons.Default.Home, label = "Home"),
                                     click = {
                                         findNavController().navigate(R.id.action_profileFragment_to_opponetListFragment)
-                                    })
+                                    },
+                                    background = Color.White
+                                )
                                 NavOptions(
 
                                     NavOption(
@@ -157,6 +166,8 @@ class ProfileFragment : Fragment() {
                                     click = {
 
                                     },
+
+                                    background = Color.LightGray.copy(alpha = 0.4f),
                                 )
                                 NavOptions(
                                     NavOption(
@@ -164,7 +175,9 @@ class ProfileFragment : Fragment() {
                                         label = "Logout"
                                     ), click = {
                                         FirebaseAuth.getInstance().signOut()
-                                    })
+                                        findNavController().navigate(R.id.action_profileFragment_to_loginFragment)
+                                    }, background = Color.White
+                                )
                             }
 
                         }
@@ -207,6 +220,8 @@ class ProfileFragment : Fragment() {
                                             contentDescription = null
                                         )
                                     }
+                                    val editText = viewModel.editText.value
+
 
                                     if (player != null) {
                                         OutlinedTextField(
@@ -214,14 +229,18 @@ class ProfileFragment : Fragment() {
                                                 .align(Alignment.CenterHorizontally)
                                                 .padding(bottom = 16.dp),
                                             value = player.name,
-                                            onValueChange = { /*TODO*/ })
+                                            onValueChange = {
+                                            /*TODO não consigo carregar o noem e editar no edit text*/
+                                            }
+
+                                        )
                                         OutlinedTextField(
                                             modifier = Modifier
                                                 .align(Alignment.CenterHorizontally)
                                                 .padding(16.dp),
                                             value = player.email,
                                             readOnly = true,
-                                            onValueChange = { /*TODO*/ })
+                                            onValueChange = {  })
                                     }
                                     LoginButton(
                                         onButtonClick = {
@@ -291,8 +310,7 @@ class ProfileFragment : Fragment() {
         userHashMap[NAME] = player.name
 
         viewModel.updateUserDetails(userHashMap)
-        Log.d("TESTE", userHashMap.toString())
-//        uploadUserImage()
+
     }
 
     fun uploadUserImage(player: Player) {

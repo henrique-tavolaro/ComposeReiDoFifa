@@ -69,8 +69,8 @@ class LoginFragment : Fragment() {
                                 modifier = Modifier
                                     .padding(top = 40.dp, bottom = 16.dp)
                                     .align(Alignment.CenterHorizontally)
-                                    .width(400.dp)
-                                    .height(400.dp)
+                                    .width(300.dp)
+                                    .height(300.dp)
                             )
 
                             Text(

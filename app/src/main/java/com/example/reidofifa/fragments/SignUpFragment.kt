@@ -1,5 +1,6 @@
 package com.example.reidofifa.fragments
 
+import android.media.MediaSession2
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
@@ -13,17 +14,27 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActionScope
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.SoftwareKeyboardController
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.example.reidofifa.BaseApplication
+import com.example.reidofifa.R
 import com.example.reidofifa.composables.LoginButton
 import com.example.reidofifa.firebase.FirestoreClass
 import com.example.reidofifa.models.Player
@@ -61,6 +72,8 @@ class SignUpFragment : Fragment() {
                         ) {
                             Text(
                                 text = "Enter e-mail, name and password to register",
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Bold,
                                 modifier = Modifier
                                     .padding(top = 32.dp, start = 16.dp, end = 16.dp)
                                     .align(Alignment.CenterHorizontally),
@@ -74,7 +87,7 @@ class SignUpFragment : Fragment() {
                             ) {
                                 Column{
 
-                                    TextField(
+                                    OutlinedTextField(
                                         modifier = Modifier
                                             .padding(top = 32.dp, start = 16.dp, end = 16.dp)
                                             .fillMaxWidth()
@@ -86,9 +99,15 @@ class SignUpFragment : Fragment() {
                                         label = {
                                             Text(text = "E-mail")
                                         },
-                                        textStyle = MaterialTheme.typography.h5
-                                    )
-                                    TextField(
+                                        textStyle = MaterialTheme.typography.h5,
+                                        keyboardOptions = KeyboardOptions(
+                                            imeAction = ImeAction.Next)
+                                        )
+
+
+
+
+                                    OutlinedTextField(
                                         value = name,
                                         onValueChange = { newValue ->
                                             viewModel.onNameChange(newValue)
@@ -101,26 +120,37 @@ class SignUpFragment : Fragment() {
                                         label = {
                                             Text(text = "Name")
                                         },
+                                        keyboardOptions = KeyboardOptions(
+                                            imeAction = ImeAction.Next
+                                        ),
                                         textStyle = MaterialTheme.typography.h5
                                     )
-                                    TextField(
+                                    OutlinedTextField(
                                         modifier = Modifier
-                                            .padding(16.dp)
+                                            .padding(bottom = 16.dp, start = 16.dp, end = 16.dp)
                                             .fillMaxWidth()
                                             .background(Color.White),
                                         value = password,
                                         onValueChange = { newValue ->
                                             viewModel.onPasswordChange(newValue)
                                         },
+
                                         label = {
                                             Text(text = "Password")
                                         },
-                                        textStyle = MaterialTheme.typography.h5
+                                        textStyle = MaterialTheme.typography.h5,
+                                        keyboardOptions = KeyboardOptions(
+                                            imeAction = ImeAction.Done,
+
+                                        ),
+
+                                        visualTransformation = PasswordVisualTransformation()
                                     )
                                     LoginButton(
                                         onButtonClick = { registerUser(email, name, password) },
                                         text = "REGISTER",
-                                        color = MaterialTheme.colors.primary)
+                                        color = MaterialTheme.colors.primary
+                                    )
                                 }
                             }
                         }
@@ -135,7 +165,7 @@ class SignUpFragment : Fragment() {
     fun userRegisteredSuccess(){
         //TODO inserir um Toast (não tava funcionando)
 //        Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
-        FirebaseAuth.getInstance().signOut()
+
         Log.e("TAG", "Success")
     }
 
@@ -148,17 +178,32 @@ class SignUpFragment : Fragment() {
             FirebaseAuth.getInstance().createUserWithEmailAndPassword(emails, passwords)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
+
                         val firebaseUser: FirebaseUser = task.result!!.user!!
                         val registeredEmail = firebaseUser.email!!
                         val user = Player(firebaseUser.uid, name, registeredEmail)
                         FirestoreClass().registerUser(this, user)
+                        signInUser(email, password)
                     } else {
 
-                        //TODO inserir um Toast (não tava funcionando)
-                    //Toast.makeText(context, task.exception!!.message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, task.exception!!.message, Toast.LENGTH_SHORT).show()
 
                     }
                 }
+        }
+    }
+
+    private fun signInUser(email: String, password: String) {
+
+           FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+//                        FirestoreClass().loadUserData(this)
+                        findNavController().navigate(R.id.action_signUpFragment_to_opponetListFragment)
+                    } else {
+                        Toast.makeText(context, "failed", Toast.LENGTH_SHORT).show()
+                    }
+
         }
     }
 
@@ -166,15 +211,13 @@ class SignUpFragment : Fragment() {
         when {
 
             TextUtils.isEmpty(email) -> {
-                //TODO inserir um Toast (não tava funcionando)
+                Toast.makeText(context, "SSS", Toast.LENGTH_LONG).show()
                 return false
             }
             TextUtils.isEmpty(name) -> {
-                //TODO inserir um Toast (não tava funcionando)
                 return false
             }
             TextUtils.isEmpty(password) -> {
-                //TODO inserir um Toast (não tava funcionando)
                 return false
             }
             else -> return true

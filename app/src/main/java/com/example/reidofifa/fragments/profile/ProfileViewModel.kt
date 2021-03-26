@@ -18,9 +18,15 @@ class ProfileViewModel @Inject constructor(
     var loading = mutableStateOf(false)
 
     val data: MutableState<Player?> = mutableStateOf(null)
+    val editText = mutableStateOf("")
 
     init {
         getUser()
+    }
+
+
+    fun onValueChanged(text: String){
+        this.editText.value = text
     }
 
     private fun getUser() {
