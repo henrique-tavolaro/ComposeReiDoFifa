@@ -33,7 +33,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.reidofifa.R
-import com.example.reidofifa.composables.loadImage
+import com.example.reidofifa.composables.*
 import com.example.reidofifa.models.Game
 import com.example.reidofifa.ui.theme.ReiDoFifaTheme
 import com.example.reidofifa.util.*
@@ -128,7 +128,6 @@ class GameFragment : Fragment() {
                                         )
                                         Stats(win, draw, lost)
                                     }
-
                                 }
 
                                 Row(modifier = Modifier.weight(1f)) {
@@ -139,7 +138,6 @@ class GameFragment : Fragment() {
                                         )
                                     }
                                 }
-
                             }
 
                             Row {
@@ -190,225 +188,10 @@ class GameFragment : Fragment() {
                                     GameResults(game)
                                 }
                             }
-
-
                         }
                     }
-
                 }
             }
-        }
-    }
-}
-
-
-@Composable
-fun Player(
-    name: String,
-    url: String
-) {
-    Card(
-        modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth(),
-        elevation = 8.dp,
-
-        ) {
-        Column(modifier = Modifier.padding(8.dp)) {
-            Text(
-                text = name,
-                fontSize = 18.sp,
-                modifier = Modifier
-                    .padding(8.dp)
-                    .align(Alignment.CenterHorizontally),
-                softWrap = false
-            )
-
-
-            val image =
-                loadImage(url = url, defaultImage = DEFAULT_IMAGE).value
-            image?.let { img ->
-                Image(
-                    bitmap = img.asImageBitmap(),
-                    modifier = Modifier
-                        .height(106.dp)
-                        .width(106.dp)
-                        .padding(8.dp)
-                        .clip(CircleShape)
-                        .align(Alignment.CenterHorizontally),
-                    contentScale = ContentScale.Crop,
-                    contentDescription = null
-                )
-            }
-        }
-
-    }
-}
-
-
-@Composable
-fun Stats(
-    win: Int,
-    draw: Int,
-    lost: Int
-) {
-    Card(
-        modifier = Modifier
-            .padding(8.dp)
-            .width(90.dp)
-            .height(90.dp),
-        elevation = 6.dp,
-        shape = CircleShape
-    ) {
-        Column {
-
-            Text(
-                text = "Stats",
-                fontSize = 16.sp,
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(top = 4.dp)
-            )
-            Divider(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp, vertical = 4.dp)
-                    .height(1.dp)
-                    .fillMaxWidth()
-            )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.CenterHorizontally),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                Text(
-                    text = "W",
-                    fontSize = 14.sp
-                )
-                Text(
-                    text = "D",
-                    fontSize = 14.sp
-                )
-                Text(
-                    text = "L",
-                    fontSize = 14.sp
-                )
-            }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.CenterHorizontally),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                Text(
-                    text = win.toString(),
-                    fontSize = 13.sp
-                )
-                Text(
-                    text = draw.toString(),
-                    fontSize = 13.sp
-                )
-                Text(
-                    text = lost.toString(),
-                    fontSize = 13.sp
-                )
-            }
-
-        }
-    }
-}
-
-@Composable
-fun InsertResult(
-    resultP1: String,
-    onResultP1Changed: (String) -> Unit,
-    resultP2: String,
-    onResultP2Changed: (String) -> Unit,
-    onClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-    ) {
-        Text(
-            text = "Insert Game Result",
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-
-            horizontalArrangement = Arrangement.SpaceEvenly
-
-        ) {
-            OutlinedTextField(
-                modifier = Modifier.width(56.dp),
-                value = resultP1,
-                onValueChange = onResultP1Changed,
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number
-                ),
-
-                // TODO arrumar o input do usuário.
-            )
-            Text(
-                text = "X",
-                fontSize = 18.sp,
-                modifier = Modifier.padding(top = 24.dp)
-            )
-            OutlinedTextField(
-                modifier = Modifier.width(56.dp),
-                value = resultP2,
-                onValueChange = onResultP2Changed,
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number
-                )
-                // TODO arrumar o input do usuário.
-            )
-        }
-        Button(
-            onClick = onClick,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .width(250.dp)
-        ) {
-            Text(
-                text = "SAVE GAME",
-                modifier = Modifier.fillMaxWidth(),
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
-            )
-        }
-    }
-}
-
-
-@Composable
-fun GameResults(game: Game) {
-    Row(
-        modifier = Modifier
-            .padding(horizontal = 8.dp, vertical = 4.dp)
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            modifier = Modifier.padding(8.dp),
-            text = game.date,
-        )
-        Row(modifier = Modifier.padding(8.dp)) {
-            Text(text = game.resultP1)
-            Text(
-                modifier = Modifier.padding(horizontal = 4.dp),
-                text = "x"
-            )
-            Text(text = game.resultP2)
         }
     }
 }

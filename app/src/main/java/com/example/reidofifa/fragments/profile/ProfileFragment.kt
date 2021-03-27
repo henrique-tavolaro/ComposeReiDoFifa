@@ -27,6 +27,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -39,6 +40,8 @@ import androidx.navigation.findNavController
 import com.example.reidofifa.R
 import com.example.reidofifa.composables.*
 import com.example.reidofifa.models.Player
+import com.example.reidofifa.ui.theme.PrimaryColor
+import com.example.reidofifa.ui.theme.PrimaryLightColor
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.example.reidofifa.ui.theme.ReiDoFifaTheme
@@ -95,7 +98,12 @@ class ProfileFragment : Fragment() {
                                     modifier = Modifier
                                         .fillMaxHeight(0.32f)
                                         .fillMaxWidth()
-                                        .background(MaterialTheme.colors.primary)
+                                        .background(brush = Brush.horizontalGradient(
+                                            colors = listOf(
+                                                PrimaryLightColor,
+                                                PrimaryColor
+                                            )
+                                        ))
                                 ) {
                                     if (player?.image != null) {
 
@@ -132,7 +140,7 @@ class ProfileFragment : Fragment() {
                                     )
                                     Text(
                                         modifier = Modifier
-                                            .padding(start = 24.dp, bottom = 16.dp, top = 8.dp),
+                                            .padding(start = 24.dp, bottom = 8.dp),
                                         text = if(player?.email == null){
                                             "email"
                                         } else {
@@ -229,6 +237,7 @@ class ProfileFragment : Fragment() {
                                                 .align(Alignment.CenterHorizontally)
                                                 .padding(bottom = 16.dp),
                                             value = player.name,
+                                            readOnly = true,
                                             onValueChange = {
                                             /*TODO não consigo carregar o noem e editar no edit text*/
                                             }
@@ -237,7 +246,7 @@ class ProfileFragment : Fragment() {
                                         OutlinedTextField(
                                             modifier = Modifier
                                                 .align(Alignment.CenterHorizontally)
-                                                .padding(16.dp),
+                                                .padding(bottom = 16.dp),
                                             value = player.email,
                                             readOnly = true,
                                             onValueChange = {  })

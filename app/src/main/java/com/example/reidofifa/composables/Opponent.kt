@@ -46,18 +46,11 @@ fun Opponent(
                         .height(60.dp)
                         .width(60.dp)
                         .clip(CircleShape),
-//                contentScale = ContentScale.Crop,
+                contentScale = ContentScale.Crop,
                     contentDescription = null
                 )
             }
-//        Image(
-//            modifier = Modifier
-//                .padding(8.dp)
-//                .height(50.dp)
-//                .width(50.dp),
-//            painter = painterResource(R.drawable.ic_user_place_holder),
-//            contentDescription = null
-//        )
+
             Column(
                 modifier = Modifier
                     .padding(8.dp)

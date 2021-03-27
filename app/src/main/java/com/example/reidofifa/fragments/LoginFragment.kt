@@ -107,9 +107,3 @@ class LoginFragment : Fragment() {
     }
 }
 
-
-@Preview
-@Composable
-fun PreviewLoginScreen() {
-//    LoginScreen()
-}

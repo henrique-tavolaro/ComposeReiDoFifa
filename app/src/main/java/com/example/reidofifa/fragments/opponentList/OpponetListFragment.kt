@@ -83,12 +83,14 @@ class OpponetListFragment : Fragment() {
                                     modifier = Modifier
                                         .fillMaxHeight(0.32f)
                                         .fillMaxWidth()
-                                            .background(brush = Brush.horizontalGradient(
-                                            colors = listOf(
-                                                PrimaryLightColor,
-                                                PrimaryColor
+                                        .background(
+                                            brush = Brush.horizontalGradient(
+                                                colors = listOf(
+                                                    PrimaryLightColor,
+                                                    PrimaryColor
+                                                )
                                             )
-                                        ))
+                                        )
                                 ) {
                                     if (player?.image != null) {
 
@@ -112,7 +114,6 @@ class OpponetListFragment : Fragment() {
                                             }
                                         }
                                     }
-
                                     Text(
                                         modifier = Modifier
                                             .padding(start = 24.dp, top = 8.dp),
@@ -123,11 +124,10 @@ class OpponetListFragment : Fragment() {
                                         },
                                         fontSize = 20.sp,
                                         color = MaterialTheme.colors.onPrimary
-
                                     )
                                     Text(
                                         modifier = Modifier
-                                            .padding(start = 24.dp, bottom = 16.dp, top = 8.dp),
+                                            .padding(start = 24.dp, bottom = 8.dp, top = 8.dp),
                                         text = if (player?.email == null) {
                                             "email"
                                         } else {
@@ -136,7 +136,6 @@ class OpponetListFragment : Fragment() {
                                         fontSize = 16.sp,
                                         color = MaterialTheme.colors.onPrimary
                                     )
-
                                 }
                                 Divider(
                                     modifier = Modifier.fillMaxWidth(),
@@ -157,7 +156,8 @@ class OpponetListFragment : Fragment() {
                                     ), click = {
                                         findNavController().navigate(R.id.action_opponetListFragment_to_profileFragment)
                                     },
-                                    background = Color.White)
+                                    background = Color.White
+                                )
                                 NavOptions(
                                     NavOption(
                                         icon = Icons.Default.ExitToApp,
@@ -165,14 +165,11 @@ class OpponetListFragment : Fragment() {
                                     ), click = {
                                         FirebaseAuth.getInstance().signOut()
                                         findNavController().navigate(R.id.action_opponetListFragment_to_loginFragment)
-                                    }, background = Color.White)
-
+                                    }, background = Color.White
+                                )
                             }
                         }
-
                     ) {
-
-
                         val opponentList = viewModel.data.value.data
 
                         LazyColumn(
@@ -180,9 +177,10 @@ class OpponetListFragment : Fragment() {
                         ) {
                             items(items = opponentList!!) { oppon ->
                                 var count = 0
-                                for(game in games!!){
-                                    if(game.players == (player!!.id + "_" + oppon.id) ||
-                                        game.players == (oppon.id + "_" + player.id)){
+                                for (game in games!!) {
+                                    if (game.players == (player!!.id + "_" + oppon.id) ||
+                                        game.players == (oppon.id + "_" + player.id)
+                                    ) {
                                         count++
                                     }
                                 }
